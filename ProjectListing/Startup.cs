@@ -2,11 +2,13 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using ProjectListing.DataFile;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,8 +28,11 @@ namespace ProjectListing
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Swagger included in our API under Swashbuckle.AspNetCore
-            services.AddControllers();
+
+            // use the SqlServer get Configuration with sqlConnection
+            services.AddDbContext<DataContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("sqlConnection"))
+            );
 
             // cors policy, to allow anyone to use the resources
             services.AddCors(x =>
@@ -45,6 +50,9 @@ namespace ProjectListing
                     " a scalable and future proofed Web API solution."
                 });
             });
+
+            // Swagger included in our API under Swashbuckle.AspNetCore
+            services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
